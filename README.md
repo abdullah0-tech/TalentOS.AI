@@ -1,1 +1,1 @@
-# TalenOS.AI
+# TalentOS.AI
