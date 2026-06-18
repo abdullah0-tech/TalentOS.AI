@@ -1,0 +1,375 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* TalentOS Premium SaaS Palette (Light Mode) */
+  --background: #F8FAFC;
+  --foreground: #0F172A;
+  
+  --card: #FFFFFF;
+  --card-foreground: #0F172A;
+  
+  --primary: #2563EB;
+  --primary-foreground: #FFFFFF;
+  
+  --secondary: #334155;
+  --secondary-foreground: #F8FAFC;
+  
+  --muted: #64748B;
+  --muted-foreground: #94A3B8;
+  
+  --border: #E2E8F0;
+  --ring: #2563EB;
+  
+  --success: #22C55E;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+  --accent: #14B8A6;
+
+  /* Backward Compatibility Variables mapped to the new token system */
+  --bg: var(--background);
+  --surface: var(--card);
+  --surface-container: var(--card);
+  --surface-high: #F1F5F9;
+  --surface-highest: #E2E8F0;
+  
+  --primary-light: #EFF6FF; /* Soft blue highlight tint */
+  
+  --on-surface: var(--foreground);
+  --on-surface-variant: var(--secondary);
+  --muted-color: var(--muted);
+  --outline: var(--border);
+}
+
+.dark {
+  /* TalentOS Premium SaaS Palette (Dark Mode) */
+  --background: #0B1020;
+  --foreground: #F8FAFC;
+  
+  --card: #111827;
+  --card-foreground: #F8FAFC;
+  
+  --primary: #3B82F6;
+  --primary-foreground: #0B1020;
+  
+  --secondary: #1A2238;
+  --secondary-foreground: #CBD5E1;
+  
+  --muted: #94A3B8;
+  --muted-foreground: #64748B;
+  
+  --border: rgba(255,255,255,0.08);
+  --ring: #3B82F6;
+  
+  --success: #22C55E;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+  --accent: #14B8A6;
+
+  /* Backward Compatibility Variables */
+  --bg: var(--background);
+  --surface: var(--card);
+  --surface-container: var(--card);
+  --surface-high: #1A2238;
+  --surface-highest: #283556;
+  
+  --primary-light: #1E293B; /* Dark slate blue highlight */
+  
+  --on-surface: var(--foreground);
+  --on-surface-variant: var(--secondary-foreground);
+  --muted-color: var(--muted);
+  --outline: var(--border);
+}
+
+@layer base {
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    font-size: 16px; /* Body Text: 16px */
+    line-height: 1.6;
+  }
+  h1 {
+    font-family: 'Geist', sans-serif;
+    font-size: 3.5rem; /* Hero Headings: 56px */
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+  h2 {
+    font-family: 'Geist', sans-serif;
+    font-size: 2.25rem; /* Section Headings: 36px */
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.25;
+  }
+  h3 {
+    font-family: 'Geist', sans-serif;
+    font-size: 1.25rem; /* Card Titles: 20px */
+    font-weight: 650;
+    letter-spacing: -0.01em;
+    line-height: 1.35;
+  }
+  h4 {
+    font-family: 'Geist', sans-serif;
+    font-size: 1rem; /* Sub-card titles */
+    font-weight: 600;
+  }
+  
+  /* Typography safety-net: Enforce 13px minimum size globally */
+  .text-[10px], .text-[11px], .text-xs, .text-[9px] {
+    font-size: 13px !important;
+  }
+  
+  /* Form input text readability safety-net */
+  input, select, textarea, button {
+    font-size: 14px !important; /* Small Text: 14px */
+  }
+}
+
+/* Custom premium scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+/* Modern SaaS workspace card styling overrides */
+.glass-panel-premium, .glass-card-premium, .glass-card, .glass-panel, .card-ai {
+  background-color: var(--card) !important;
+  color: var(--card-foreground) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 16px !important; /* Rounded corners: modern SaaS standard */
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05) !important; /* Subtle, premium shadow */
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  position: relative;
+  overflow: hidden;
+}
+.glass-panel-premium:hover, .glass-card-premium:hover, .glass-card:hover, .glass-panel:hover, .card-ai:hover {
+  transform: translateY(-2px) !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Force card text color for perfect readability */
+.glass-panel-premium h1, .glass-panel-premium h2, .glass-panel-premium h3, .glass-panel-premium h4, .glass-panel-premium p, .glass-panel-premium span,
+.glass-card-premium h1, .glass-card-premium h2, .glass-card-premium h3, .glass-card-premium h4, .glass-card-premium p, .glass-card-premium span,
+.glass-card h1, .glass-card h2, .glass-card h3, .glass-card h4, .glass-card p, .glass-card span,
+.glass-panel h1, .glass-panel h2, .glass-panel h3, .glass-panel h4, .glass-panel p, .glass-panel span,
+.card-ai h1, .card-ai h2, .card-ai h3, .card-ai h4, .card-ai p, .card-ai span {
+  color: var(--card-foreground);
+}
+
+/* Custom premium buttons */
+.btn-primary {
+  background-color: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+  padding: 10px 20px !important;
+  border-radius: 12px !important; /* Modern rounded edges */
+  font-weight: 600 !important;
+  border: 1.5px solid var(--primary) !important;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.1) !important;
+  transition: all 0.15s ease-in-out !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  letter-spacing: -0.01em !important;
+  text-transform: none !important; /* Avoid forced uppercase font */
+  font-family: 'Inter', sans-serif !important;
+}
+.btn-primary:hover {
+  background-color: transparent !important;
+  color: var(--primary) !important;
+  transform: translateY(-1px) !important;
+}
+.btn-primary:active {
+  transform: translateY(0) !important;
+}
+
+.btn-ghost {
+  background: transparent !important;
+  border: 1.5px solid var(--border) !important;
+  color: var(--foreground) !important;
+  padding: 10px 20px !important;
+  border-radius: 12px !important;
+  font-weight: 600 !important;
+  transition: all 0.15s ease-in-out !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  letter-spacing: -0.01em !important;
+  text-transform: none !important;
+  font-family: 'Inter', sans-serif !important;
+}
+.btn-ghost:hover {
+  background: var(--surface-high) !important;
+  color: var(--foreground) !important;
+  border-color: var(--primary) !important;
+}
+
+/* Form input styling overrides (accessible and modern) */
+.input-dark, .input-modern {
+  background: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--foreground) !important;
+  border-radius: 12px !important; /* Soft rounded corners */
+  padding: 12px 16px !important;
+  width: 100% !important;
+  font-family: 'Inter', sans-serif !important;
+  transition: all 0.15s ease !important;
+  outline: none !important;
+}
+.input-dark:focus, .input-modern:focus {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12) !important;
+  background: var(--card) !important;
+}
+.input-dark::placeholder, .input-modern::placeholder { 
+  color: var(--muted) !important; 
+}
+
+/* Status Badges styling */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: var(--primary-light);
+  color: var(--primary);
+  border: 1px solid var(--border);
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+}
+
+.badge-active   { background: rgba(34, 197, 94, 0.1) !important; color: #16a34a !important; border: 1px solid rgba(34, 197, 94, 0.2) !important; border-radius: 8px !important; padding: 4px 10px; font-weight: 600; }
+.badge-inactive { background: var(--surface-high) !important; color: var(--muted) !important; border: 1px solid var(--border) !important; border-radius: 8px !important; padding: 4px 10px; font-weight: 600; }
+.badge-warning  { background: rgba(245, 158, 11, 0.1) !important; color: #d97706 !important; border: 1px solid rgba(245, 158, 11, 0.2) !important; border-radius: 8px !important; padding: 4px 10px; font-weight: 600; }
+.badge-danger, .badge-error { background: rgba(239, 68, 68, 0.1) !important; color: #dc2626 !important; border: 1px solid rgba(239, 68, 68, 0.2) !important; border-radius: 8px !important; padding: 4px 10px; font-weight: 600; }
+
+.navbar {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  width: 100%;
+}
+
+.navbar-premium {
+  background: var(--card) !important;
+  border-bottom: 1px solid var(--border) !important;
+  position: relative;
+}
+
+.spinner {
+  width: 28px; height: 28px;
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.bg-grid-pattern {
+  background-size: 40px 40px;
+  background-image: 
+    linear-gradient(to right, rgba(37, 99, 235, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(37, 99, 235, 0.03) 1px, transparent 1px);
+}
+
+.neon-badge-primary {
+  background: var(--primary-light);
+  color: var(--primary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-weight: 600;
+}
+.neon-badge-secondary {
+  background: var(--card);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-weight: 600;
+}
+.neon-badge-tertiary {
+  background: rgba(20, 184, 166, 0.1) !important;
+  color: #0d9488 !important;
+  border: 1px solid rgba(20, 184, 166, 0.2) !important;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-weight: 600;
+}
+
+/* Flat Corporate Audit Log Styles */
+.mcp-terminal {
+  font-family: 'JetBrains Mono', monospace;
+  background: #0F172A;
+  border: 1px solid #1E293B;
+  border-radius: 12px;
+  color: #F1F5F9;
+}
+.dark .mcp-terminal {
+  background: #020617;
+  border: 1px solid #1E293B;
+}
+.mcp-terminal-header {
+  background: #1E293B;
+  border-bottom: 1px solid #334155;
+  padding: 10px 14px;
+}
+.mcp-terminal-content {
+  padding: 14px;
+  line-height: 1.6;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Theme transitions */
+.theme-transition, .theme-transition * {
+  transition: background-color 200ms cubic-bezier(0.4, 0, 0.2, 1), 
+              border-color 200ms cubic-bezier(0.4, 0, 0.2, 1), 
+              color 200ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Sidebar premium light overrides */
+aside {
+  background-color: var(--card) !important;
+  border-right: 1px solid var(--border) !important;
+}
+aside nav a {
+  border-radius: 8px !important;
+  margin: 2px 8px !important;
+}
+aside nav a:hover {
+  background-color: var(--surface-high) !important;
+}
+aside nav h4 {
+  padding-left: 20px !important;
+  margin-top: 16px !important;
+}

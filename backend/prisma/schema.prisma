@@ -1,0 +1,579 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Company {
+  id               String         @id @default(uuid())
+  name             String
+  email            String         @unique
+  logo             String?
+  subscriptionPlan String         @default("free") // "free", "pro", "enterprise"
+  createdAt        DateTime       @default(now())
+  users             User[]
+  jobs              Job[]
+  employees         Employee[]
+  notifications     Notification[]
+  activities        Activity[]
+  knowledgeDocuments KnowledgeDocument[]
+  aiConversations   AIConversation[]
+  auditLogs         AuditLog[]
+  emailTemplates    EmailTemplate[]
+  documents         Document[]
+  automations       Automation[]
+  subscription      Subscription?
+  integrations      Integration[]
+  auditSecurityLogs AuditSecurityLog[]
+  invites           EmployeeInvite[]
+  emailLogs         EmailLog[]
+  emailSetting      EmailSetting?
+  feedbacks         Feedback[]
+
+  @@map("companies")
+}
+
+model User {
+  id                 String          @id @default(uuid())
+  companyId          String          @map("company_id")
+  employeeId         String?         @unique @map("employee_id")
+  name               String
+  email              String          @unique
+  password           String          @map("password_hash")
+  role               String          @default("member") // "owner", "admin", "member", "employee"
+  isActive           Boolean         @default(false) @map("is_active")
+  mustChangePassword Boolean         @default(false) @map("must_change_password")
+  emailVerified      Boolean         @default(false) @map("email_verified")
+  isDemo             Boolean         @default(false) @map("is_demo")
+  lastLogin          DateTime?       @map("last_login")
+  createdAt          DateTime        @default(now()) @map("created_at")
+  company            Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  employee           Employee?       @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  interviews         Interview[]     @relation("InterviewerRelation")
+  candidateNotes     CandidateNote[]
+  activities         Activity[]
+  aiConversations    AIConversation[]
+  auditLogs          AuditLog[]
+  reviews            PerformanceReview[]
+  emailLogs          EmailLog[]
+  feedbacks          Feedback[]
+  resetToken         String?         @map("reset_token")
+  resetTokenExpires  DateTime?       @map("reset_token_expires")
+
+  @@map("users")
+}
+
+model Job {
+  id             String        @id @default(uuid())
+  companyId      String        @map("company_id")
+  title          String
+  slug           String        @unique
+  department     String
+  location       String
+  employmentType String        @map("employment_type") // e.g., "full-time", "part-time", "contract", "internship"
+  skills         String        // Comma-separated or JSON list of required skills
+  description    String
+  status         String        @default("draft") // "draft", "published", "archived"
+  createdAt      DateTime      @default(now()) @map("created_at")
+  company        Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  applications   Application[]
+
+  @@map("jobs")
+}
+
+model Application {
+  id                      String          @id @default(uuid())
+  jobId                   String          @map("job_id")
+  candidateName           String          @map("candidate_name")
+  email                   String
+  resumeUrl               String          @map("resume_url")
+  linkedinUrl             String?         @map("linkedin_url")
+  portfolioUrl            String?         @map("portfolio_url")
+  
+  // AI screening results
+  aiScore                 Int?            @map("ai_score")
+  matchedSkills           String?         @map("matched_skills")   // JSON-stringified array
+  missingSkills           String?         @map("missing_skills")   // JSON-stringified array
+  aiSummary               String?         @map("ai_summary")
+  experienceLevel         String?         @map("experience_level")
+  recommendation          String?
+  
+  // Phase 2 Advanced AI Candidate Insights
+  strengths               String?         // JSON-stringified array
+  weaknesses              String?         // JSON-stringified array
+  personalitySummary      String?         @map("personality_summary")
+  communicationAssessment String?         @map("communication_assessment")
+  technicalStrength       String?         @map("technical_strength")
+  leadershipPotential     String?         @map("leadership_potential")
+
+  status                  String          @default("applied") // "applied", "screening", "interviewing", "offered", "rejected"
+  createdAt               DateTime        @default(now()) @map("created_at")
+  job                     Job             @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  interviews              Interview[]
+  notes                   CandidateNote[]
+  ranking                 CandidateRanking?
+  emailLogs               EmailLog[]
+
+  @@map("applications")
+}
+
+model Interview {
+  id            String      @id @default(uuid())
+  candidateId   String      @map("candidate_id")
+  interviewerId String      @map("interviewer_id")
+  date          DateTime
+  meetingLink   String?     @map("meeting_link")
+  status        String      @default("scheduled") // "scheduled", "completed", "cancelled"
+  reminderSent  Boolean     @default(false) @map("reminder_sent")
+  createdAt     DateTime    @default(now()) @map("created_at")
+
+  candidate     Application @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  interviewer   User        @relation(name: "InterviewerRelation", fields: [interviewerId], references: [id], onDelete: Cascade)
+
+  @@map("interviews")
+}
+
+model Employee {
+  id              String              @id @default(uuid())
+  companyId       String              @map("company_id")
+  name            String
+  email           String              @unique
+  department      String
+  position        String
+  phone           String?
+  status          String              @default("active") // "active", "suspended", "terminated"
+  joinedAt        DateTime            @default(now()) @map("joined_at")
+  company         Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  onboardingTasks OnboardingTask[]
+  leaveRequests   LeaveRequest[]
+  attendance      Attendance[]
+  reviews         PerformanceReview[]
+  goals           Goal[]
+  courses         EmployeeCourse[]
+  user            User?
+  
+  departmentId    String?             @map("department_id")
+  departmentRel   DepartmentHierarchy? @relation(fields: [departmentId], references: [id])
+  managerId       String?             @map("manager_id")
+  manager         Employee?           @relation("ManagerRelation", fields: [managerId], references: [id])
+  subordinates    Employee[]          @relation("ManagerRelation")
+  payrolls        Payroll[]
+  invites         EmployeeInvite[]
+  emailLogs       EmailLog[]
+
+  @@map("employees")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  companyId String   @map("company_id")
+  title     String
+  message   String
+  type      String   @default("info") // "info", "success", "warning", "error"
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model CandidateNote {
+  id          String      @id @default(uuid())
+  candidateId String      @map("candidate_id")
+  userId      String      @map("user_id")
+  note        String
+  createdAt   DateTime    @default(now()) @map("created_at")
+
+  candidate   Application @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("candidate_notes")
+}
+
+model Activity {
+  id        String   @id @default(uuid())
+  companyId String   @map("company_id")
+  userId    String   @map("user_id")
+  action    String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("activities")
+}
+
+model KnowledgeDocument {
+  id         String          @id @default(uuid())
+  companyId  String          @map("company_id")
+  title      String
+  fileUrl    String?         @map("file_url")
+  status     String          @default("processing") // "processing", "ready", "failed"
+  createdAt  DateTime        @default(now()) @map("created_at")
+  company    Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  chunks     DocumentChunk[]
+
+  @@map("knowledge_documents")
+}
+
+model DocumentChunk {
+  id         String            @id @default(uuid())
+  documentId String            @map("document_id")
+  content    String
+  embedding  Json?             // Stores the vector float array as JSON
+  document   KnowledgeDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@map("document_chunks")
+}
+
+model AIConversation {
+  id        String   @id @default(uuid())
+  companyId String   @map("company_id")
+  userId    String   @map("user_id")
+  message   String
+  response  String
+  createdAt DateTime @default(now()) @map("created_at")
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("ai_conversations")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  companyId String   @map("company_id")
+  userId    String   @map("user_id")
+  action    String
+  entity    String
+  details   String?  // JSON string storing modified parameters
+  timestamp DateTime @default(now())
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("audit_logs")
+}
+
+model EmailTemplate {
+  id        String   @id @default(uuid())
+  companyId String   @map("company_id")
+  name      String
+  subject   String
+  content   String
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("email_templates")
+}
+
+model CandidateRanking {
+  id             String      @id @default(uuid())
+  candidateId    String      @unique @map("candidate_id")
+  overallScore   Int         @map("overall_score")
+  technicalScore Int         @map("technical_score")
+  cultureScore   Int         @map("culture_score")
+  feedback       String?
+  candidate      Application @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+
+  @@map("candidate_rankings")
+}
+
+model OnboardingTask {
+  id         String   @id @default(uuid())
+  employeeId String   @map("employee_id")
+  title      String
+  status     String   @default("pending") // "pending", "in_progress", "completed"
+  dueDate    DateTime @map("due_date")
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@map("onboarding_tasks")
+}
+
+model LeaveRequest {
+  id         String   @id @default(uuid())
+  employeeId String   @map("employee_id")
+  leaveType  String   @map("leave_type") // "annual", "sick", "casual", "unpaid"
+  startDate  DateTime @map("start_date")
+  endDate    DateTime @map("end_date")
+  status     String   @default("pending") // "pending", "approved", "rejected"
+  reason     String?
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@map("leave_requests")
+}
+
+model Attendance {
+  id         String    @id @default(uuid())
+  employeeId String    @map("employee_id")
+  checkIn    DateTime  @map("check_in")
+  checkOut   DateTime? @map("check_out")
+  location   String    @default("office") // "office", "remote"
+  date       DateTime  @default(now())
+  employee   Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@map("attendance")
+}
+
+model PerformanceReview {
+  id          String   @id @default(uuid())
+  employeeId  String   @map("employee_id")
+  reviewerId  String   @map("reviewer_id")
+  rating      Int      // 1 to 5 scale
+  feedback    String
+  reviewCycle String   @default("Q1_2026") @map("review_cycle")
+  employee    Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  reviewer    User     @relation(fields: [reviewerId], references: [id], onDelete: Cascade)
+
+  @@map("performance_reviews")
+}
+
+model Goal {
+  id         String   @id @default(uuid())
+  employeeId String   @map("employee_id")
+  title      String
+  progress   Int      @default(0) // 0 to 100%
+  targetDate DateTime @map("target_date")
+  level      String   @default("individual") // "individual", "department", "company"
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@map("goals")
+}
+
+model Course {
+  id          String           @id @default(uuid())
+  title       String
+  description String
+  enrollments EmployeeCourse[]
+
+  @@map("courses")
+}
+
+model EmployeeCourse {
+  id         String   @id @default(uuid())
+  employeeId String   @map("employee_id")
+  courseId   String   @map("course_id")
+  progress   Int      @default(0) // 0 to 100%
+  completed  Boolean  @default(false)
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  course     Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@map("employee_courses")
+}
+
+model Document {
+  id        String   @id @default(uuid())
+  companyId String   @map("company_id")
+  title     String
+  fileUrl   String   @map("file_url")
+  type      String   // "contract", "offer_letter", "policy", "certificate", "review"
+  createdAt DateTime @default(now()) @map("created_at")
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("documents")
+}
+
+model Automation {
+  id        String   @id @default(uuid())
+  companyId String   @map("company_id")
+  trigger   String
+  action    String
+  active    Boolean  @default(true)
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("automations")
+}
+
+model Subscription {
+  id                 String   @id @default(uuid())
+  companyId          String   @unique @map("company_id")
+  planId             String   @map("plan_id")
+  status             String   @default("active") // "active", "canceled", "trialing", "past_due"
+  stripeSubscriptionId String?  @map("stripe_subscription_id")
+  currentPeriodStart DateTime @default(now()) @map("current_period_start")
+  currentPeriodEnd   DateTime @map("current_period_end")
+  createdAt          DateTime @default(now()) @map("created_at")
+  company            Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  plan               Plan     @relation(fields: [planId], references: [id], onDelete: Cascade)
+  invoices           Invoice[]
+
+  @@map("subscriptions")
+}
+
+model Plan {
+  id             String         @id @default(uuid())
+  name           String         // "Starter", "Professional", "Business", "Enterprise"
+  price          Float
+  billingInterval String        @default("monthly") @map("billing_interval") // "monthly", "yearly"
+  seatLimit      Int            @default(10) @map("seat_limit")
+  features       String         // JSON-stringified array of features
+  subscriptions  Subscription[]
+
+  @@map("plans")
+}
+
+model Invoice {
+  id             String        @id @default(uuid())
+  subscriptionId String        @map("subscription_id")
+  companyId      String        @map("company_id")
+  amount         Float
+  status         String        @default("unpaid") // "paid", "unpaid", "voided"
+  invoiceUrl     String?       @map("invoice_url")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  subscription   Subscription  @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  payments       Payment[]
+
+  @@map("invoices")
+}
+
+model Payment {
+  id                    String   @id @default(uuid())
+  invoiceId             String   @map("invoice_id")
+  companyId             String   @map("company_id")
+  amount                Float
+  status                String   @default("pending") // "succeeded", "failed", "pending"
+  stripePaymentIntentId String?  @map("stripe_payment_intent_id")
+  createdAt             DateTime @default(now()) @map("created_at")
+  invoice               Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+
+model DepartmentHierarchy {
+  id         String   @id @default(uuid())
+  companyId  String   @map("company_id")
+  name       String
+  parentId   String?  @map("parent_id")
+  parent     DepartmentHierarchy?  @relation("DepartmentParent", fields: [parentId], references: [id], onDelete: Cascade)
+  children   DepartmentHierarchy[] @relation("DepartmentParent")
+  employees  Employee[]
+
+  @@map("departments")
+}
+
+model Payroll {
+  id         String   @id @default(uuid())
+  employeeId String   @map("employee_id")
+  baseSalary Float    @map("base_salary")
+  allowances Float    @default(0)
+  bonuses    Float    @default(0)
+  deductions Float    @default(0)
+  netPay     Float    @map("net_pay")
+  cycle      String   // e.g., "June_2026"
+  status     String   @default("pending") // "pending", "processed"
+  payslipUrl String?  @map("payslip_url")
+  createdAt  DateTime @default(now()) @map("created_at")
+  employee   Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@map("payrolls")
+}
+
+model Integration {
+  id          String   @id @default(uuid())
+  companyId   String   @map("company_id")
+  provider    String   // "slack", "teams", "google_calendar", "outlook_calendar", "google_drive", "onedrive", "bamboohr", "workday", "linkedin"
+  status      String   @default("disconnected") // "disconnected", "disconnected"
+  credentials String?  // Encrypted token string
+  createdAt   DateTime @default(now()) @map("created_at")
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("integrations")
+}
+
+model AuditSecurityLog {
+  id        String   @id @default(uuid())
+  companyId String   @map("company_id")
+  userId    String   @map("user_id")
+  event     String   // "MFA_ENABLED", "SSO_LOGIN", "IP_BLOCKED", "PASSWORD_CHANGED"
+  ipAddress String   @map("ip_address")
+  timestamp DateTime @default(now())
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("audit_security_logs")
+}
+
+model EmployeeInvite {
+  id         String    @id @default(uuid())
+  companyId  String    @map("company_id")
+  employeeId String    @map("employee_id")
+  token      String    @unique
+  expiresAt  DateTime  @map("expires_at")
+  usedAt     DateTime? @map("used_at")
+  status     String    @default("pending") // "pending", "accepted", "expired", "cancelled"
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  company    Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  employee   Employee  @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@map("employee_invites")
+}
+
+model EmailLog {
+  id           String       @id @default(uuid())
+  companyId    String       @map("company_id")
+  userId       String?      @map("user_id")
+  candidateId  String?      @map("candidate_id")
+  employeeId   String?      @map("employee_id")
+  email        String
+  eventType    String       @map("event_type")
+  subject      String
+  status       String       // "pending", "sent", "failed"
+  provider     String       // "resend", "sendgrid", "smtp", "console"
+  sentAt       DateTime     @default(now()) @map("sent_at")
+  errorMessage String?      @map("error_message")
+  retryCount   Int          @default(0) @map("retry_count")
+  nextAttempt  DateTime?    @map("next_attempt")
+  metadata     Json?        // Optional bag: store plaintext tokens, context vars, etc.
+
+  company      Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user         User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  candidate    Application? @relation(fields: [candidateId], references: [id], onDelete: SetNull)
+  employee     Employee?    @relation(fields: [employeeId], references: [id], onDelete: SetNull)
+
+  @@map("email_logs")
+}
+
+model EmailSetting {
+  id             String   @id @default(uuid())
+  companyId      String   @unique @map("company_id")
+  provider       String   @default("console") // "resend", "sendgrid", "smtp", "console"
+  resendApiKey   String?  @map("resend_api_key")
+  sendgridApiKey String?  @map("sendgrid_api_key")
+  smtpHost       String?  @map("smtp_host")
+  smtpPort       Int?     @map("smtp_port")
+  smtpUser       String?  @map("smtp_user")
+  smtpPass       String?  @map("smtp_pass")
+  smtpSecure     Boolean  @default(true) @map("smtp_secure")
+  smtpEncryption String   @default("TLS") @map("smtp_encryption") // "TLS", "SSL", "None"
+  replyToEmail   String?  @map("reply_to_email")
+  senderName     String   @default("HireFlow AI") @map("sender_name")
+  senderEmail    String   @default("noreply@hireflow.ai") @map("sender_email")
+  enabledEvents  String   @default("candidate-applied,shortlisted,interview-scheduled,interview-reminder,rejected,offer-letter,hired,employee-invitation,account-activated,password-reset,leave-approved,leave-rejected") @map("enabled_events")
+
+  company        Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("email_settings")
+}
+
+model Feedback {
+  id            String   @id @default(uuid())
+  companyId     String   @map("company_id")
+  userId        String?  @map("user_id")
+  type          String   // "General Feedback", "Bug Report", "Feature Request", "UI Improvement", "Performance Issue", "Security Concern"
+  message       String
+  priority      String   // "Low", "Medium", "High"
+  status        String   @default("New") // "New", "In Review", "Planned", "Completed", "Rejected"
+  pageUrl       String?  @map("page_url")
+  browser       String?
+  role          String?
+  appVersion    String?  @map("app_version")
+  screenshotUrl String?  @map("screenshot_url")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  company       Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  user          User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("feedbacks")
+}
