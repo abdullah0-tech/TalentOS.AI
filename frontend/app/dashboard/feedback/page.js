@@ -16,10 +16,8 @@ import {
   Info
 } from 'lucide-react';
 import { request } from '../../../services/api';
-import { useAuth } from '../../../context/AuthContext';
 
 export default function FeedbackCenterPage() {
-  const { user } = useAuth();
   const [feedback, setFeedback] = useState([]);
   const [metrics, setMetrics] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
