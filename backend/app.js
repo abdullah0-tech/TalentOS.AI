@@ -167,7 +167,7 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`=================================================`);
   console.log(`🚀 HireFlow AI Backend Server active on port ${PORT}`);
   console.log(`=================================================`);
