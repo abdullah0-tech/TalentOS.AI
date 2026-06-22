@@ -64,6 +64,36 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'healthy', timestamp: new Date() });
 });
 
+// Root route for deployment verification
+app.get('/', (req, res) => {
+  res.status(200).json({
+    name: 'HireFlow AI Backend',
+    status: 'active',
+    message: 'Backend is up and running successfully.',
+    environment: process.env.NODE_ENV || 'development',
+    timestamp: new Date()
+  });
+});
+
+// API Index route
+app.get('/api', (req, res) => {
+  res.status(200).json({
+    message: 'HireFlow AI API Index',
+    version: '1.0.0',
+    documentation: 'Append specific endpoint paths to use the API (e.g., /api/auth)',
+    endpoints: [
+      '/api/auth', '/api/jobs', '/api/applications', '/api/interviews',
+      '/api/employees', '/api/notifications', '/api/analytics', '/api/chat',
+      '/api/ai', '/api/knowledge', '/api/audit-logs', '/api/onboarding',
+      '/api/leave', '/api/attendance', '/api/performance-review', '/api/goals',
+      '/api/training', '/api/documents', '/api/automation', '/api/workforce-insights',
+      '/api/billing', '/api/organization', '/api/integrations', '/api/payroll',
+      '/api/security', '/api/whitelabel', '/api/aiexecutive', '/api/emails',
+      '/api/feedback'
+    ]
+  });
+});
+
 // Router mounting
 app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobsRoutes);
