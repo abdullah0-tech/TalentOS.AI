@@ -48,7 +48,15 @@ const socketService = require('./services/socket.service');
 socketService.init(server);
 
 // Middlewares
-app.use(cors());
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow all origins (including dynamic Vercel URLs)
+    callback(null, true);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
