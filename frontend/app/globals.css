@@ -121,7 +121,7 @@
   }
   
   /* Typography safety-net: Enforce 13px minimum size globally */
-  .text-[10px], .text-[11px], .text-xs, .text-[9px] {
+  .text-\[10px\], .text-\[11px\], .text-xs, .text-\[9px\] {
     font-size: 13px !important;
   }
   
