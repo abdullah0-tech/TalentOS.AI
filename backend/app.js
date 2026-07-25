@@ -39,6 +39,7 @@ const whitelabelRoutes = require('./routes/whitelabel.routes');
 const aiExecutiveRoutes = require('./routes/aiexecutive.routes');
 const emailsRoutes = require('./routes/emails.routes');
 const feedbackRoutes = require('./routes/feedback.routes');
+const superadminRoutes = require('./routes/superadmin.routes');
 
 const app = express();
 const server = http.createServer(app);
@@ -55,8 +56,12 @@ app.use(cors({
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Bypass-Tunnel-Reminder']
 }));
+
+const webhookRoutes = require('./routes/webhook.routes');
+app.use('/api/webhooks', webhookRoutes);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -132,6 +137,7 @@ app.use('/api/whitelabel', whitelabelRoutes);
 app.use('/api/aiexecutive', aiExecutiveRoutes);
 app.use('/api/emails', emailsRoutes);
 app.use('/api/feedback', feedbackRoutes);
+app.use('/api/superadmin', superadminRoutes);
 
 // Direct AI Resume Screening route (protected)
 const authMiddleware = require('./middleware/auth.middleware');

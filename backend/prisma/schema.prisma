@@ -12,7 +12,9 @@ model Company {
   name             String
   email            String         @unique
   logo             String?
-  subscriptionPlan String         @default("free") // "free", "pro", "enterprise"
+  subscriptionPlan String         @default("free") // "free", "professional", "enterprise"
+  stripeCustomerId String?        @map("stripe_customer_id")
+  trialEndsAt      DateTime?      @map("trial_ends_at")
   createdAt        DateTime       @default(now())
   users             User[]
   jobs              Job[]
@@ -32,6 +34,8 @@ model Company {
   emailLogs         EmailLog[]
   emailSetting      EmailSetting?
   feedbacks         Feedback[]
+  paymentMethods    PaymentMethod[]
+  workspaceUsage    WorkspaceUsage?
 
   @@map("companies")
 }
@@ -390,7 +394,9 @@ model Subscription {
   companyId          String   @unique @map("company_id")
   planId             String   @map("plan_id")
   status             String   @default("active") // "active", "canceled", "trialing", "past_due"
-  stripeSubscriptionId String?  @map("stripe_subscription_id")
+  stripeSubscriptionId String?  @unique @map("stripe_subscription_id")
+  stripePriceId      String?  @map("stripe_price_id")
+  cancelAtPeriodEnd  Boolean  @default(false) @map("cancel_at_period_end")
   currentPeriodStart DateTime @default(now()) @map("current_period_start")
   currentPeriodEnd   DateTime @map("current_period_end")
   createdAt          DateTime @default(now()) @map("created_at")
@@ -415,13 +421,19 @@ model Plan {
 
 model Invoice {
   id             String        @id @default(uuid())
-  subscriptionId String        @map("subscription_id")
+  subscriptionId String?       @map("subscription_id")
   companyId      String        @map("company_id")
+  stripeInvoiceId String?      @unique @map("stripe_invoice_id")
+  invoiceNumber  String?       @map("invoice_number")
   amount         Float
-  status         String        @default("unpaid") // "paid", "unpaid", "voided"
-  invoiceUrl     String?       @map("invoice_url")
+  tax            Float         @default(0)
+  discount       Float         @default(0)
+  total          Float         @default(0)
+  status         String        @default("unpaid") // "paid", "unpaid", "voided", "open"
+  invoicePdf     String?       @map("invoice_pdf")
+  paymentMethod  String?       @map("payment_method") // e.g. "Visa ending in 4242"
   createdAt      DateTime      @default(now()) @map("created_at")
-  subscription   Subscription  @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
   payments       Payment[]
 
   @@map("invoices")
@@ -576,4 +588,57 @@ model Feedback {
   user          User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   @@map("feedbacks")
+}
+
+model PaymentMethod {
+  id                String   @id @default(uuid())
+  companyId         String   @map("company_id")
+  stripePaymentMethodId String @unique @map("stripe_payment_method_id")
+  brand             String
+  last4             String
+  expMonth          Int      @map("exp_month")
+  expYear           Int      @map("exp_year")
+  isDefault         Boolean  @default(false) @map("is_default")
+  createdAt         DateTime @default(now()) @map("created_at")
+  company           Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("payment_methods")
+}
+
+model Coupon {
+  id                String   @id @default(uuid())
+  code              String   @unique
+  percentageDiscount Float?  @map("percentage_discount")
+  fixedDiscount     Float?   @map("fixed_discount")
+  expiryDate        DateTime? @map("expiry_date")
+  usageLimit        Int?     @map("usage_limit")
+  timesUsed         Int      @default(0) @map("times_used")
+  active            Boolean  @default(true)
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  @@map("coupons")
+}
+
+model WebhookEvent {
+  id                String   @id @default(uuid())
+  stripeEventId     String   @unique @map("stripe_event_id")
+  type              String
+  processed         Boolean  @default(false)
+  error             String?
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  @@map("webhook_events")
+}
+
+model WorkspaceUsage {
+  id                String   @id @default(uuid())
+  companyId         String   @unique @map("company_id")
+  employeeCount     Int      @default(0) @map("employee_count")
+  candidateCount    Int      @default(0) @map("candidate_count")
+  jobCount          Int      @default(0) @map("job_count")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  company           Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("workspace_usage")
 }

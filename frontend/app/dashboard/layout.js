@@ -86,8 +86,12 @@ import {
   ChevronRight,
   Layers,
   Database,
+  TrendingUp,
+  Bug,
+  Lightbulb,
   Video,
-  TrendingUp
+  Wallet,
+  Receipt
 } from 'lucide-react';
 
 export default function DashboardLayout({ children }) {
@@ -493,6 +497,14 @@ export default function DashboardLayout({ children }) {
         { name: 'Leave Analytics', key: 'leaveAnalytics', href: '/dashboard/analytics?tab=leave', icon: CalendarDays },
         { name: 'Performance Metrics', key: 'performanceMetrics', href: '/dashboard/analytics?tab=performance', icon: Award },
         { name: 'AI Forecasting', key: 'aiForecasting', href: '/dashboard/workforce-intelligence', icon: BrainCircuit }
+      ]
+    },
+    {
+      title: 'Billing & Subscription',
+      items: [
+        { name: 'Subscription Plan', key: 'billingPlan', href: '/dashboard/billing', icon: CreditCard },
+        { name: 'Payment Methods', key: 'paymentMethods', href: '/dashboard/billing?tab=payment-methods', icon: Wallet },
+        { name: 'Invoice History', key: 'invoiceHistory', href: '/dashboard/billing?tab=invoices', icon: Receipt }
       ]
     },
     {
@@ -961,7 +973,7 @@ export default function DashboardLayout({ children }) {
         <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 pt-20 lg:pt-8 bg-background relative">
           <div className="absolute inset-0 bg-grid-pattern opacity-[0.25] pointer-events-none" />
           <div className="max-w-7xl mx-auto relative z-10 pb-20">
-            {user?.email === 'demo@talentos.ai' && (
+            {currentUser?.email === 'demo@talentos.ai' && (
               <div className="mb-6 bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-200 dark:border-indigo-500/20 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm relative z-20">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-indigo-100 dark:bg-indigo-500/20 rounded-lg text-indigo-600 dark:text-indigo-400 shrink-0">
