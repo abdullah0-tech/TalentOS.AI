@@ -12,9 +12,11 @@ import {
   Lock, 
   Clock, 
   CornerUpLeft, 
-  Info
+  Info,
+  Settings
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Link from 'next/link';
 
 export default function GmailInboxPage() {
   const [connected, setConnected] = useState(true);
@@ -312,6 +314,14 @@ export default function GmailInboxPage() {
         </div>
 
         <div className="flex items-center gap-3 flex-wrap">
+          <Link
+            href="/dashboard/settings?tab=email"
+            className="px-4 py-2.5 rounded-xl border border-outline bg-surface-high hover:bg-surface-highest text-on-surface font-bold text-xs transition-all flex items-center gap-2 shadow-sm"
+          >
+            <Settings size={14} className="text-primary" />
+            Automations & Settings
+          </Link>
+          
           {/* Connect Real Gmail — always visible as primary CTA */}
           <button
             onClick={handleConnectGmail}

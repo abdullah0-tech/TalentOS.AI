@@ -30,7 +30,7 @@ export default function FeedbackCenterPage() {
 
   const fetchFeedback = async () => {
     try {
-      const data = await request('/api/feedback');
+      const data = await request('/feedback');
       setFeedback(data.feedback);
       setMetrics(data.metrics);
     } catch (error) {
@@ -42,7 +42,7 @@ export default function FeedbackCenterPage() {
 
   const updateStatus = async (id, newStatus) => {
     try {
-      await request(`/api/feedback/${id}/status`, {
+      await request(`/feedback/${id}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })

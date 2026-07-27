@@ -138,3 +138,50 @@ exports.updateJob = async (req, res) => {
     res.status(500).json({ error: 'An error occurred while updating the job.' });
   }
 };
+
+const { generateJobDescription } = require('../services/ai.service');
+
+exports.generateJobWithAI = async (req, res) => {
+  try {
+    const { title, skills } = req.body;
+    if (!title) {
+      return res.status(400).json({ error: 'Job title is required to generate a description.' });
+    }
+
+    const aiGeneratedData = await generateJobDescription(title, 'Mid-Senior', skills || '', '');
+    
+    const descText = `
+**Role Overview**
+${aiGeneratedData.hiringExpectations || 'We are looking for a talented individual to join our growing team.'}
+
+**Key Responsibilities**
+${(aiGeneratedData.responsibilities || []).map(r => `• ${r}`).join('\n')}
+
+**Requirements & Skills**
+${(aiGeneratedData.requirements || []).map(r => `• ${r}`).join('\n')}
+
+**Preferred Qualifications**
+${(aiGeneratedData.preferredSkills || []).map(r => `• ${r}`).join('\n')}
+
+**Benefits**
+${(aiGeneratedData.benefits || []).map(r => `• ${r}`).join('\n')}
+    `.trim();
+
+    aiGeneratedData.description = descText;
+    aiGeneratedData.department = 'Engineering / Product';
+    aiGeneratedData.location = 'Remote';
+    aiGeneratedData.employmentType = 'full-time';
+
+    // Convert array skills to comma-separated string if necessary
+    if (Array.isArray(aiGeneratedData.requirements)) {
+      aiGeneratedData.skills = aiGeneratedData.requirements.join(', ');
+    } else {
+      aiGeneratedData.skills = aiGeneratedData.requirements;
+    }
+
+    res.status(200).json(aiGeneratedData);
+  } catch (error) {
+    console.error('AI Job Generation Error:', error);
+    res.status(500).json({ error: 'Failed to generate job using AI.' });
+  }
+};

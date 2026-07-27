@@ -7,6 +7,7 @@ const authMiddleware = require('../middleware/auth.middleware');
 router.get('/:slug', jobsController.getJobBySlug);
 
 // Tenant-protected routes
+router.post('/generate', authMiddleware, jobsController.generateJobWithAI);
 router.post('/', authMiddleware, jobsController.createJob);
 router.get('/', authMiddleware, jobsController.getJobs);
 router.put('/:id', authMiddleware, jobsController.updateJob);

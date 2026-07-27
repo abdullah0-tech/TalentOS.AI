@@ -60,7 +60,8 @@ export default function ActivateAccountPage({ searchParams }) {
 
     const validateToken = async () => {
       try {
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+        const rawUrl = process.env.NEXT_PUBLIC_API_URL || 'https://talentos-ai-k8mi.onrender.com/api';
+        const API_URL = rawUrl.endsWith('/api') ? rawUrl : `${rawUrl.replace(/\/$/, '')}/api`;
         const res = await fetch(`${API_URL}/auth/validate-invite?token=${token}`);
         const data = await res.json();
 
@@ -96,7 +97,8 @@ export default function ActivateAccountPage({ searchParams }) {
       setSubmitting(true);
       setError('');
 
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      const rawUrl = process.env.NEXT_PUBLIC_API_URL || 'https://talentos-ai-k8mi.onrender.com/api';
+      const API_URL = rawUrl.endsWith('/api') ? rawUrl : `${rawUrl.replace(/\/$/, '')}/api`;
       const res = await fetch(`${API_URL}/auth/activate-account`, {
         method: 'POST',
         headers: {

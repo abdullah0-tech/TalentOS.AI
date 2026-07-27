@@ -1,8 +1,7 @@
 import { io } from 'socket.io-client';
 
-const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL 
-  ? process.env.NEXT_PUBLIC_API_URL.replace('/api', '') 
-  : 'http://localhost:5000';
+const rawApiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://talentos-ai-k8mi.onrender.com/api';
+const SOCKET_URL = rawApiUrl.replace(/\/api\/?$/, '').replace(/\/$/, '');
 
 let socketInstance = null;
 

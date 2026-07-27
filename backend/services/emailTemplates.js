@@ -3,6 +3,28 @@
  */
 
 const DEFAULT_TEMPLATES = {
+  'new-feedback': {
+    name: 'New Feedback Submitted',
+    subject: 'New Feedback: {{feedback_type}}',
+    ctaText: 'View Feedback Dashboard',
+    content: `Hello,
+
+A user has just submitted new feedback regarding the application.
+
+### Feedback Details:
+* **User**: {{user_name}}
+* **Type**: {{feedback_type}}
+* **Priority**: {{feedback_priority}}
+
+**Message:**
+{{feedback_message}}
+
+Please log in to the admin dashboard to review and manage this feedback.
+
+Best regards,
+**HireFlow AI System**`
+  },
+
   'candidate-applied': {
     name: 'Application Received',
     subject: 'Application Received – {{job_title}}',

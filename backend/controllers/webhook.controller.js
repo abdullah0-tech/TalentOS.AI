@@ -164,24 +164,39 @@ async function handleSubscriptionUpdated(subscription) {
     where: { stripeCustomerId: customerId }
   });
 
-  if (!company) return;
+  const priceId = subscription.items.data[0]?.price.id;
+
+  // Check if we have this plan in our database
+  let dbPlan = null;
+  if (priceId) {
+    dbPlan = await prisma.plan.findUnique({ where: { id: priceId } });
+  }
+
+  // If the plan doesn't exist, we fallback or abort (in a real system we'd sync it)
+  const planIdToUse = dbPlan ? dbPlan.id : null;
+
+  if (!planIdToUse) {
+    console.error(`⚠️ Webhook received for unknown Stripe Price ID: ${priceId}`);
+    // We cannot create a subscription without a valid planId due to FK constraint
+    return;
+  }
 
   await prisma.subscription.upsert({
     where: { companyId: company.id },
     update: {
       status: subscription.status,
       stripeSubscriptionId: subscription.id,
-      stripePriceId: subscription.items.data[0]?.price.id,
+      stripePriceId: priceId,
       cancelAtPeriodEnd: subscription.cancel_at_period_end,
       currentPeriodStart: new Date(subscription.current_period_start * 1000),
       currentPeriodEnd: new Date(subscription.current_period_end * 1000)
     },
     create: {
       companyId: company.id,
-      planId: 'dummy-plan-id', // In a real system, you'd match stripePriceId to the Plan ID
+      planId: planIdToUse,
       status: subscription.status,
       stripeSubscriptionId: subscription.id,
-      stripePriceId: subscription.items.data[0]?.price.id,
+      stripePriceId: priceId,
       cancelAtPeriodEnd: subscription.cancel_at_period_end,
       currentPeriodStart: new Date(subscription.current_period_start * 1000),
       currentPeriodEnd: new Date(subscription.current_period_end * 1000)

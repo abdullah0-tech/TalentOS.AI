@@ -38,10 +38,13 @@ exports.submitFeedback = async (req, res) => {
       where: { companyId, role: { in: ['admin', 'owner'] }, isDemo: false }
     });
 
-    for (const admin of admins) {
+    const emailsToNotify = new Set(admins.map(a => a.email));
+    emailsToNotify.add('talentosai.contact@gmail.com');
+
+    for (const email of emailsToNotify) {
       await triggerWorkflow('new-feedback', {
         companyId,
-        email: admin.email,
+        email: email,
         details: {
           feedback_type: type,
           feedback_message: message,

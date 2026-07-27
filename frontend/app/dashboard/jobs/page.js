@@ -14,7 +14,8 @@ import {
   ExternalLink,
   ChevronRight,
   Eye,
-  AlertCircle
+  AlertCircle,
+  Sparkles
 } from 'lucide-react';
 import WorkforceLoader from '../../../components/WorkforceLoader';
 
@@ -22,6 +23,7 @@ export default function JobsPage() {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
+  const [generatingAI, setGeneratingAI] = useState(false);
   const [copiedId, setCopiedId] = useState(null);
   const [error, setError] = useState('');
 
@@ -75,6 +77,35 @@ export default function JobsPage() {
     } catch (err) {
       console.error(err);
       alert('Failed to change status.');
+    }
+  };
+
+  const handleGenerateAI = async () => {
+    if (!form.title) {
+      setFormError('Please enter a Job Title first to generate with AI.');
+      return;
+    }
+    setFormError('');
+    setGeneratingAI(true);
+    
+    try {
+      const data = await request('/jobs/generate', {
+        method: 'POST',
+        body: { title: form.title, skills: form.skills }
+      });
+      
+      setForm(prev => ({
+        ...prev,
+        department: data.department || prev.department,
+        location: data.location || prev.location,
+        employmentType: data.employmentType || prev.employmentType,
+        skills: data.skills || prev.skills,
+        description: data.description || prev.description
+      }));
+    } catch (err) {
+      setFormError(err.message || 'AI Generation failed.');
+    } finally {
+      setGeneratingAI(false);
     }
   };
 
@@ -276,7 +307,18 @@ export default function JobsPage() {
               <form onSubmit={handleSubmit} className="mt-6 space-y-5">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-muted uppercase tracking-wider mb-1.5">Job Title</label>
+                    <label className="flex justify-between items-center text-xs font-semibold text-muted uppercase tracking-wider mb-1.5">
+                      <span>Job Title</span>
+                      <button 
+                        type="button" 
+                        onClick={handleGenerateAI}
+                        disabled={generatingAI}
+                        className="text-[10px] bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/20 px-2 py-1 rounded flex items-center gap-1 transition-colors"
+                      >
+                        {generatingAI ? <Loader2 size={10} className="animate-spin" /> : <Sparkles size={10} />}
+                        Auto-fill with AI
+                      </button>
+                    </label>
                     <input 
                       type="text" 
                       required 
@@ -375,23 +417,24 @@ export default function JobsPage() {
                     </label>
                   </div>
                 </div>
-              </form>
-            </div>
 
-            <div className="pt-6 border-t border-outline flex gap-3">
-              <button
-                onClick={() => setShowDrawer(false)}
-                className="w-1/2 py-2.5 bg-surface-high hover:bg-slate-700 rounded-xl text-on-surface-variant font-semibold text-sm transition"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSubmit}
-                disabled={creating}
-                className="w-1/2 py-2.5 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-white font-semibold text-sm transition disabled:opacity-55 flex items-center justify-center gap-2"
-              >
-                {creating ? <Loader2 size={16} className="animate-spin" /> : 'Create Posting'}
-              </button>
+                <div className="pt-6 border-t border-outline flex gap-3 mt-8">
+                  <button
+                    type="button"
+                    onClick={() => setShowDrawer(false)}
+                    className="w-1/2 py-2.5 bg-surface-high hover:bg-slate-700 rounded-xl text-on-surface-variant font-semibold text-sm transition"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={creating}
+                    className="w-1/2 py-2.5 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-white font-semibold text-sm transition disabled:opacity-55 flex items-center justify-center gap-2"
+                  >
+                    {creating ? <Loader2 size={16} className="animate-spin" /> : 'Create Posting'}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>

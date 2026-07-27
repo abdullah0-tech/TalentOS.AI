@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { request } from '../../../services/api';
+import PayslipModal from '../../../components/PayslipModal';
 import { 
   FolderLock, 
   FileText, 
@@ -18,6 +19,7 @@ export default function EmployeeDocuments() {
   const [documents, setDocuments] = useState([]);
   const [payrolls, setPayrolls] = useState([]);
   const [error, setError] = useState('');
+  const [selectedPayslip, setSelectedPayslip] = useState(null);
 
   const loadData = async () => {
     try {
@@ -194,14 +196,15 @@ export default function EmployeeDocuments() {
                         <td className="py-4.5 px-4 font-black text-on-surface">${payroll.netPay.toFixed(2)}</td>
                         <td className="py-4.5 px-4">
                           {payroll.payslipUrl ? (
-                            <a
-                              href={payroll.payslipUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                setSelectedPayslip(payroll);
+                              }}
                               className="inline-flex items-center gap-1.5 text-xs text-indigo-400 hover:text-indigo-300 transition-colors font-bold bg-indigo-500/10 px-3 py-1.5 rounded-lg border border-indigo-500/20"
                             >
                               <Download size={14} /> View PDF
-                            </a>
+                            </button>
                           ) : (
                             <span className="text-xs text-muted font-bold">Generating...</span>
                           )}
@@ -221,6 +224,13 @@ export default function EmployeeDocuments() {
           </div>
         )}
       </div>
+
+      {selectedPayslip && (
+        <PayslipModal
+          payroll={selectedPayslip}
+          onClose={() => setSelectedPayslip(null)}
+        />
+      )}
     </div>
   );
 }

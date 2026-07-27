@@ -82,7 +82,7 @@ export default function FeedbackModal({ isOpen, onClose, initialType = 'General 
       }
 
       // 2. Submit feedback
-      await request('/api/feedback', {
+      await request('/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

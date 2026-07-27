@@ -24,6 +24,30 @@ exports.createApplication = async (req, res) => {
       return res.status(404).json({ error: 'The specified job posting was not found.' });
     }
 
+    // 0. Subscription Limit Enforcement
+    const companyData = await prisma.company.findUnique({
+      where: { id: job.companyId },
+      include: {
+        subscription: { include: { plan: true } }
+      }
+    });
+
+    const planName = companyData?.subscription?.plan?.name?.toLowerCase() || companyData?.subscriptionPlan || 'free';
+    let maxCandidates = 20;
+    if (planName.includes('professional')) maxCandidates = 1000;
+    if (planName.includes('business')) maxCandidates = 5000;
+    if (planName.includes('enterprise')) maxCandidates = 9999;
+
+    const currentCandidateCount = await prisma.application.count({ 
+      where: { job: { companyId: job.companyId } } 
+    });
+
+    if (currentCandidateCount >= maxCandidates) {
+      return res.status(403).json({ 
+        error: `Subscription limit reached. The ${planName} plan allows a maximum of ${maxCandidates} candidate applications.` 
+      });
+    }
+
     // Relative web URL to access the uploaded file
     const resumeUrl = `/uploads/${req.file.filename}`;
 

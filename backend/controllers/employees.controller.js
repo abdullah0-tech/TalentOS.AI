@@ -16,6 +16,28 @@ exports.createEmployee = async (req, res) => {
       return res.status(400).json({ error: 'name, email, department, and position are required.' });
     }
 
+    // 1. Subscription Limit Enforcement
+    const companyData = await prisma.company.findUnique({
+      where: { id: companyId },
+      include: {
+        subscription: { include: { plan: true } }
+      }
+    });
+
+    const planName = companyData?.subscription?.plan?.name?.toLowerCase() || companyData?.subscriptionPlan || 'free';
+    let maxEmployees = 5;
+    if (planName.includes('professional')) maxEmployees = 100;
+    if (planName.includes('business')) maxEmployees = 250;
+    if (planName.includes('enterprise')) maxEmployees = 9999;
+
+    const currentEmployeeCount = await prisma.employee.count({ where: { companyId } });
+    
+    if (currentEmployeeCount >= maxEmployees) {
+      return res.status(403).json({ 
+        error: `Subscription limit reached. The ${planName} plan allows a maximum of ${maxEmployees} employees. Please upgrade your plan to add more.` 
+      });
+    }
+
     // Check if email already belongs to an employee in the company
     const existingEmployee = await prisma.employee.findUnique({
       where: { email }

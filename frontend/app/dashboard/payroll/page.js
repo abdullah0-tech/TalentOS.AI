@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { request } from '../../../services/api';
+import PayslipModal from '../../../components/PayslipModal';
 import { 
   Coins, 
   Plus, 
@@ -23,6 +24,9 @@ export default function PayrollPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  // Selected payslip state for modal
+  const [selectedPayslip, setSelectedPayslip] = useState(null);
 
   // Calculate payroll form states
   const [selectedEmpId, setSelectedEmpId] = useState('');
@@ -347,17 +351,13 @@ export default function PayrollPage() {
                             )}
                           </button>
                           
-                          <a 
-                            href="#"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              alert(`Downloading Payslip for ${pay.employee?.name} (${pay.cycle})...`);
-                            }}
-                            className="inline-flex items-center justify-center p-1.5 rounded-lg border border-outline bg-background text-muted hover:text-on-surface transition"
-                            title="Download PDF Payslip"
+                          <button
+                            onClick={() => setSelectedPayslip(pay)}
+                            className="inline-flex items-center justify-center p-1.5 rounded-lg border border-outline bg-background text-muted hover:text-on-surface hover:bg-surface-high transition shadow-sm"
+                            title="View Professional Payslip"
                           >
                             <FileText size={12} />
-                          </a>
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -369,6 +369,14 @@ export default function PayrollPage() {
         </div>
 
       </div>
+
+      {/* Render Payslip Modal */}
+      {selectedPayslip && (
+        <PayslipModal 
+          payroll={selectedPayslip} 
+          onClose={() => setSelectedPayslip(null)} 
+        />
+      )}
     </div>
   );
 }

@@ -140,7 +140,7 @@ export default function DocumentVaultPage() {
   // Helper for API endpoint path resolution
   const backendUrl = process.env.NEXT_PUBLIC_API_URL 
     ? process.env.NEXT_PUBLIC_API_URL.replace('/api', '') 
-    : 'http://localhost:5000';
+    : 'https://talentos-ai-k8mi.onrender.com';
 
   return (
     <div className="space-y-8">

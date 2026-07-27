@@ -1,4 +1,5 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const rawBaseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://talentos-ai-k8mi.onrender.com/api';
+const API_BASE_URL = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl.replace(/\/$/, '')}/api`;
 
 /**
  * Base HTTP request handler with token injection and content-type parsing.
