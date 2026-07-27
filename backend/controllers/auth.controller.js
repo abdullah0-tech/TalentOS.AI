@@ -69,7 +69,8 @@ exports.register = async (req, res) => {
     });
   } catch (error) {
     console.error('Registration Error:', error);
-    res.status(500).json({ error: 'An error occurred during company registration.' });
+    const errorMessage = error.message || 'An error occurred during company registration.';
+    res.status(500).json({ error: errorMessage });
   }
 };
 

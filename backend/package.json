@@ -5,6 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
+    "build": "npx prisma generate && npx prisma db push",
     "dev": "nodemon app.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
