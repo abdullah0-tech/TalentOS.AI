@@ -642,3 +642,35 @@ model WorkspaceUsage {
 
   @@map("workspace_usage")
 }
+
+model ContactMessage {
+  id         String   @id @default(uuid())
+  name       String
+  company    String?
+  email      String
+  phone      String?
+  category   String
+  subject    String
+  message    String
+  attachment String?
+  status     String   @default("New") // "New", "In Progress", "Resolved", "Closed"
+  ipAddress  String?  @map("ip_address")
+  userAgent  String?  @map("user_agent")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("contact_messages")
+}
+
+model PlatformStat {
+  id           String   @id @default(uuid())
+  key          String   @unique // "organizations_using", "active_employees", "applications_processed", "emails_automated", "ai_resume_analyses"
+  label        String
+  value        Int      @default(0)
+  suffix       String?  @default("+")
+  displayOrder Int      @default(0) @map("display_order")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@map("platform_stats")
+}
+

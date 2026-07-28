@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import ThemeToggle from '../components/ThemeToggle';
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+import FloatingContactButton from '../components/FloatingContactButton';
 import { 
   ArrowRight, Bot, Cpu, Users, Shield, Terminal, ArrowUpRight, Check, 
   FileText, Lock, Star, HelpCircle, ChevronDown, Sparkles, Plus, 
@@ -82,44 +85,7 @@ export default function Home() {
     <div className="min-h-screen bg-surface-high dark:bg-background text-on-surface dark:text-on-surface flex flex-col font-sans transition-colors duration-200">
       
       {/* Premium Navbar */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-surface/80 dark:bg-background/80 backdrop-blur-md border-b border-outline dark:border-outline/80 transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            {/* Elegant Icon Logo */}
-            <div className="w-9 h-9 bg-[#0047FF] hover:bg-[#0036C7] rounded-xl flex items-center justify-center text-on-surface transition-all shadow-md shadow-blue-500/10">
-              <Sparkles size={18} className="text-on-surface" />
-            </div>
-            <span className="text-xl font-bold tracking-tight text-on-surface dark:text-on-surface font-display">
-              TalentOS<span className="text-[#0047FF]">.AI</span>
-            </span>
-          </div>
-
-          {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-on-surface-variant dark:text-on-surface-variant">
-            <a href="#features" className="hover:text-[#0047FF] transition-colors">Features</a>
-            <a href="#how-it-works" className="hover:text-[#0047FF] transition-colors">How It Works</a>
-            <a href="#copilot" className="hover:text-[#0047FF] transition-colors">HR Copilot</a>
-            <a href="#employee-portal" className="hover:text-[#0047FF] transition-colors">Employee Portal</a>
-            <a href="#pricing" className="hover:text-[#0047FF] transition-colors">Pricing</a>
-          </nav>
-
-          <div className="flex items-center gap-4">
-            <ThemeToggle />
-            <Link 
-              href="/login" 
-              className="text-sm font-semibold text-on-surface-variant dark:text-on-surface-variant hover:text-[#0047FF] dark:hover:text-[#0047FF] transition-colors px-3 py-2"
-            >
-              Sign In
-            </Link>
-            <Link 
-              href="/register" 
-              className="hidden sm:inline-flex px-4 py-2 bg-[#0047FF] hover:bg-[#0036C7] text-on-surface text-sm font-semibold rounded-xl transition-all shadow-sm shadow-blue-500/10"
-            >
-              Start Free Trial
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       {/* Main Container */}
       <main className="flex-1 pt-16">
@@ -1235,56 +1201,10 @@ export default function Home() {
       </main>
 
       {/* Premium Footer */}
-      <footer className="bg-surface text-muted text-xs py-16 border-t border-outline">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 pb-12 border-b border-outline">
-            
-            <div className="space-y-4">
-              <span className="text-base font-bold text-on-surface tracking-tight font-display">TalentOS.AI</span>
-              <p className="text-[11px] text-muted leading-relaxed">
-                The operating system for modern recruitment, candidate screening, and employee portal automation.
-              </p>
-            </div>
-
-            <div className="space-y-3">
-              <h4 className="text-on-surface font-bold text-xs uppercase tracking-wider">Product</h4>
-              <ul className="space-y-2">
-                <li><a href="#features" className="hover:text-on-surface transition-colors">Features</a></li>
-                <li><a href="#copilot" className="hover:text-on-surface transition-colors">HR Copilot</a></li>
-                <li><a href="#pricing" className="hover:text-on-surface transition-colors">Pricing</a></li>
-              </ul>
-            </div>
-
-            <div className="space-y-3">
-              <h4 className="text-on-surface font-bold text-xs uppercase tracking-wider">Security</h4>
-              <ul className="space-y-2">
-                <li><a href="#" className="hover:text-on-surface transition-colors">Tenant Isolation</a></li>
-                <li><a href="#" className="hover:text-on-surface transition-colors">Data Encryption</a></li>
-                <li><a href="#" className="hover:text-on-surface transition-colors">GDPR & Compliance</a></li>
-              </ul>
-            </div>
-
-            <div className="space-y-3">
-              <h4 className="text-on-surface font-bold text-xs uppercase tracking-wider">Company</h4>
-              <ul className="space-y-2">
-                <li><a href="#" className="hover:text-on-surface transition-colors">About Us</a></li>
-                <li><a href="#" className="hover:text-on-surface transition-colors">Contact Sales</a></li>
-                <li><a href="#" className="hover:text-on-surface transition-colors">Privacy Policy</a></li>
-              </ul>
-            </div>
-
-          </div>
-
-          <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] text-muted uppercase font-semibold">
-            <p>&copy; {new Date().getFullYear()} TalentOS Technologies Inc. All rights reserved.</p>
-            <div className="flex gap-4">
-              <span className="px-3 py-1 bg-surface-high text-blue-400 rounded border border-outline">Enterprise Ready</span>
-              <span className="px-3 py-1 bg-surface-high text-green-400 rounded border border-outline">Active Stage</span>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
+      <FloatingContactButton />
 
     </div>
   );
 }
+

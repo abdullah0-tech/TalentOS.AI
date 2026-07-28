@@ -102,6 +102,7 @@ export default function DashboardLayout({ children }) {
   const [authChecked, setAuthChecked] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [unreadCustomerMessagesCount, setUnreadCustomerMessagesCount] = useState(0);
   const [activeToast, setActiveToast] = useState(null);
 
   // Profile Dropdown state
@@ -203,6 +204,7 @@ export default function DashboardLayout({ children }) {
       setAuthChecked(true);
 
       fetchUnreadCount();
+      fetchUnreadCustomerMessagesCount();
 
       if (user?.companyId) {
         const socket = socketService.connect(user.companyId);
@@ -293,6 +295,18 @@ export default function DashboardLayout({ children }) {
       setUnreadCount(unread);
     } catch (err) {
       console.error('Failed to load notifications unread count:', err);
+    }
+  };
+
+  const fetchUnreadCustomerMessagesCount = async () => {
+    try {
+      const res = await fetch('/api/contact/messages/unread-count');
+      const data = await res.json();
+      if (res.ok && data.unreadCount !== undefined) {
+        setUnreadCustomerMessagesCount(data.unreadCount);
+      }
+    } catch (err) {
+      console.error('Failed to load customer messages unread count:', err);
     }
   };
 
@@ -433,6 +447,7 @@ export default function DashboardLayout({ children }) {
     {
       title: 'Communication Hub',
       items: [
+        { name: 'Customer Messages', key: 'customerMessages', href: '/dashboard/customer-messages', icon: MessageSquare, badge: unreadCustomerMessagesCount },
         { name: 'Email Center', key: 'emailCenter', href: '/dashboard/gmail', icon: Mail },
         { name: 'Automated Email Workflows', key: 'automatedEmailWorkflows', href: '/dashboard/automations', icon: Zap },
         { name: 'Interview Invitations', key: 'interviewInvitations', href: '/dashboard/gmail?tab=invitations', icon: Send },
@@ -786,6 +801,11 @@ export default function DashboardLayout({ children }) {
                                 <item.icon size={12} className={isActive ? 'text-primary' : 'text-muted group-hover:text-on-surface'} />
                                 <span>{t(item.key)}</span>
                               </div>
+                              {item.badge > 0 && (
+                                <span className="px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-[#0047FF] text-white">
+                                  {item.badge}
+                                </span>
+                              )}
                             </Link>
                           );
                         })}

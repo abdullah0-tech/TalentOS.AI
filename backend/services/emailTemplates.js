@@ -281,6 +281,119 @@ Best regards,
 {{feedback_message}}
 
 Please log in to your Admin Dashboard to review this feedback.`
+  },
+  'contact-confirmation': {
+    name: 'Contact Confirmation',
+    subject: "We've Received Your Message",
+    ctaText: 'Visit TalentOS Portal',
+    content: `Thank you for contacting TalentOS.
+
+We have successfully received your inquiry and our team will respond as soon as possible.
+
+Regards,
+
+TalentOS Team`
+  },
+  'support-request': {
+    name: 'Support Request Received',
+    subject: 'Support Request Received: {{subject}}',
+    ctaText: 'View Support Center',
+    content: `Hello {{name}},
+
+Thank you for contacting TalentOS Technical Support. We have received your request regarding **{{subject}}**.
+
+### Inquiry Summary:
+* **Category**: {{category}}
+* **Company**: {{company}}
+* **Submitted On**: {{timestamp}}
+
+### Message:
+{{message}}
+
+Our support engineering team has been alerted and will review your request shortly.
+
+Regards,
+**TalentOS Support Team**`
+  },
+  'feedback-received': {
+    name: 'Feedback Received',
+    subject: 'Thank You for Your Feedback: {{subject}}',
+    ctaText: 'Explore TalentOS',
+    content: `Hello {{name}},
+
+Thank you for sharing your feedback with TalentOS! We value your insights on **{{subject}}** as we continuously enhance our AI-powered HR platform.
+
+### Message Submitted:
+{{message}}
+
+Our product design and engineering teams review every submission to shape our future roadmap.
+
+Regards,
+**TalentOS Product Team**`
+  },
+  'bug-report-received': {
+    name: 'Bug Report Received',
+    subject: '[Bug Report Received] {{subject}}',
+    ctaText: 'Visit TalentOS Portal',
+    content: `Hello {{name}},
+
+Thank you for submitting a bug report regarding **{{subject}}**. We appreciate you helping us keep TalentOS reliable and high-performing.
+
+### Report Summary:
+* **Priority**: {{priority}}
+* **Browser**: {{browser}}
+* **Operating System**: {{os}}
+
+### Description:
+{{message}}
+
+Our engineering quality team will investigate this issue immediately.
+
+Regards,
+**TalentOS QA & Engineering Team**`
+  },
+  'feature-request-received': {
+    name: 'Feature Request Received',
+    subject: 'Feature Request Logged: {{subject}}',
+    ctaText: 'View TalentOS Features',
+    content: `Hello {{name}},
+
+We have logged your feature request for **{{subject}}**! TalentOS is built around the needs of modern HR and recruitment teams.
+
+### Your Request:
+{{message}}
+
+Our product managers will evaluate this idea for an upcoming release.
+
+Regards,
+**TalentOS Product Team**`
+  },
+  'admin-notification': {
+    name: 'New Customer Submission',
+    subject: '[TalentOS Admin Alert] New {{submission_type}}: {{subject}}',
+    ctaText: 'View in Admin Dashboard',
+    content: `A new **{{submission_type}}** has been submitted on TalentOS.
+
+### Submitter Information:
+* **Name**: {{name}}
+* **Email**: {{email}}
+* **Company**: {{company}}
+* **Phone**: {{phone}}
+* **Workspace Name**: {{workspace_name}}
+* **User Role**: {{role}}
+* **Priority**: {{priority}}
+
+### System & Device Metadata:
+* **Browser**: {{browser}}
+* **Operating System**: {{os}}
+* **Timestamp**: {{timestamp}}
+* **IP Address**: {{ip_address}}
+* **Attachment**: {{attachment}}
+
+### Message / Description:
+{{message}}
+
+Please check the Customer Messages or Feedback dashboard in TalentOS Admin to respond.`
   }
 };
 
@@ -408,11 +521,13 @@ function wrapHtml({ title, contentHtml, ctaText, ctaLink, logoText = 'H', compan
     <!-- Footer -->
     <div style="background-color: #0f172a; padding: 24px 32px; border-top: 1px solid #334155; text-align: center; font-size: 12px; color: #64748b;">
       <div style="margin-bottom: 12px;">
-        <a href="#" style="color: #64748b; text-decoration: underline; margin: 0 8px;">Support Helpdesk</a>
-        <span style="color: #334155;">&bull;</span>
-        <a href="#" style="color: #64748b; text-decoration: underline; margin: 0 8px;">Privacy Policy</a>
+        <span style="color: #cbd5e1; font-weight: bold;">TalentOS</span>
+        <span style="color: #334155; margin: 0 8px;">&bull;</span>
+        <span style="color: #94a3b8;">AI-Powered HR Platform</span>
+        <span style="color: #334155; margin: 0 8px;">&bull;</span>
+        <a href="mailto:talentosai.contact@gmail.com" style="color: #38bdf8; text-decoration: underline;">talentosai.contact@gmail.com</a>
       </div>
-      <div>&copy; ${year} ${companyName}. Powered by HireFlow AI. All rights reserved.</div>
+      <div>&copy; ${year} TalentOS Technologies Inc. All rights reserved.</div>
     </div>
   </div>
 </body>

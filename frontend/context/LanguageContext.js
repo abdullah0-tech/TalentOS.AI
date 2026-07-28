@@ -54,6 +54,7 @@ const translations = {
     performanceReviews: 'Performance Reviews',
     trainingLms: 'Training & LMS',
     emailCenter: 'Email Center',
+    customerMessages: 'Customer Messages',
     automatedEmailWorkflows: 'Automated Email Workflows',
     interviewInvitations: 'Interview Invitations',
     employeeAnnouncements: 'Employee Announcements',

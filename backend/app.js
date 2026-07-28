@@ -40,6 +40,7 @@ const aiExecutiveRoutes = require('./routes/aiexecutive.routes');
 const emailsRoutes = require('./routes/emails.routes');
 const feedbackRoutes = require('./routes/feedback.routes');
 const superadminRoutes = require('./routes/superadmin.routes');
+const contactRoutes = require('./routes/contact.routes');
 
 const app = express();
 const server = http.createServer(app);
@@ -138,6 +139,7 @@ app.use('/api/aiexecutive', aiExecutiveRoutes);
 app.use('/api/emails', emailsRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/superadmin', superadminRoutes);
+app.use('/api/contact', contactRoutes);
 
 // Direct AI Resume Screening route (protected)
 const authMiddleware = require('./middleware/auth.middleware');

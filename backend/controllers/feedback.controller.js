@@ -1,5 +1,7 @@
 const prisma = require('../config/db');
 const { triggerWorkflow } = require('../services/workflow.service');
+const { sendEmailDirect } = require('../services/email.service');
+const { compileAndWrap } = require('../services/emailTemplates');
 
 // Submit new feedback
 exports.submitFeedback = async (req, res) => {
@@ -33,24 +35,66 @@ exports.submitFeedback = async (req, res) => {
       }
     });
 
-    // Notify Admins
-    const admins = await prisma.user.findMany({
-      where: { companyId, role: { in: ['admin', 'owner'] }, isDemo: false }
+    let workspaceName = 'Public Workspace';
+    if (companyId) {
+      const comp = await prisma.company.findUnique({ where: { id: companyId } });
+      if (comp && comp.name) workspaceName = comp.name;
+    }
+
+    const submissionType = type || 'General Feedback';
+    const subject = req.body.subject || `${submissionType}: ${message.substring(0, 50)}...`;
+    const timestamp = new Date().toISOString();
+    const osInfo = req.body.os || 'Windows/OS';
+    const attachmentVal = screenshotUrl || req.body.attachment || 'None';
+
+    // 1. Automatically forward to talentosai.contact@gmail.com
+    const adminEmailPayload = compileAndWrap('admin-notification', null, null, {
+      submission_type: submissionType,
+      subject: subject,
+      name: req.user ? req.user.name : (req.body.name || 'Anonymous'),
+      email: req.user ? req.user.email : (req.body.email || 'N/A'),
+      company: workspaceName,
+      phone: req.body.phone || 'N/A',
+      workspace_name: workspaceName,
+      role: req.user ? req.user.role : (role || 'Member'),
+      priority: priority,
+      browser: browser || 'Standard Browser',
+      os: osInfo,
+      timestamp: timestamp,
+      ip_address: req.ip || '127.0.0.1',
+      attachment: attachmentVal,
+      message: message
+    }, { name: 'TalentOS AI Platform' });
+
+    await sendEmailDirect({
+      companyId: companyId || null,
+      to: 'talentosai.contact@gmail.com',
+      subject: adminEmailPayload.subject,
+      html: adminEmailPayload.html,
+      eventType: 'feedback-notification'
     });
 
-    const emailsToNotify = new Set(admins.map(a => a.email));
-    emailsToNotify.add('talentosai.contact@gmail.com');
+    // 2. Automatically send confirmation email to sender
+    if (req.user && req.user.email) {
+      let tmplName = 'feedback-received';
+      if (submissionType.toLowerCase().includes('bug')) tmplName = 'bug-report-received';
+      else if (submissionType.toLowerCase().includes('feature')) tmplName = 'feature-request-received';
 
-    for (const email of emailsToNotify) {
-      await triggerWorkflow('new-feedback', {
-        companyId,
-        email: email,
-        details: {
-          feedback_type: type,
-          feedback_message: message,
-          feedback_priority: priority,
-          user_name: req.user ? req.user.name : 'Guest'
-        }
+      const userEmailPayload = compileAndWrap(tmplName, null, null, {
+        name: req.user.name,
+        subject: subject,
+        message: message,
+        priority: priority,
+        browser: browser || 'Standard Browser',
+        os: osInfo
+      }, { name: 'TalentOS AI Platform' });
+
+      await sendEmailDirect({
+        companyId: companyId || null,
+        to: req.user.email,
+        subject: userEmailPayload.subject,
+        html: userEmailPayload.html,
+        eventType: 'feedback-confirmation'
       });
     }
 
