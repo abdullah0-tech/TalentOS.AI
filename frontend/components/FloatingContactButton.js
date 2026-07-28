@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { MessageSquare, X, Send, Sparkles, CheckCircle, ExternalLink } from 'lucide-react';
+import { request } from '../services/api';
 
 export default function FloatingContactButton() {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,22 +26,16 @@ export default function FloatingContactButton() {
     setError('');
 
     try {
-      const res = await fetch('/api/contact', {
+      await request('/contact', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+        body: {
           name,
           email,
           category,
           subject: `[Quick Widget] ${category}`,
           message
-        })
+        }
       });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to send message');
-      }
 
       setSuccess(true);
       setName('');

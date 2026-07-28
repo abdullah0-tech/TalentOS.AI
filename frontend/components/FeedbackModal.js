@@ -74,7 +74,7 @@ export default function FeedbackModal({ isOpen, onClose, initialType = 'General 
         
         // Use generic document upload endpoint or create a specific one
         // For now we assume a document upload endpoint exists that handles this
-        const uploadRes = await request('/api/documents/upload', {
+        const uploadRes = await request('/documents/upload', {
           method: 'POST',
           body: formData,
         });

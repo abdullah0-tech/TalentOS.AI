@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import FloatingContactButton from '../../components/FloatingContactButton';
+import { request } from '../../services/api';
 import { 
   Sparkles, Shield, Cpu, Users, Zap, CheckCircle, Bot, Mail, 
   BarChart3, Cloud, Layout, Lock, Briefcase, Award, ArrowRight, 
@@ -50,9 +51,8 @@ export default function AboutUsPage() {
   useEffect(() => {
     async function fetchStats() {
       try {
-        const res = await fetch('/api/contact/stats');
-        const data = await res.json();
-        if (res.ok && data.data && data.data.length > 0) {
+        const data = await request('/contact/stats');
+        if (data.data && data.data.length > 0) {
           setStats(data.data);
         }
       } catch (err) {

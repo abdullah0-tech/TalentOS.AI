@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import FloatingContactButton from '../../components/FloatingContactButton';
+import { request } from '../../services/api';
 import { 
   Mail, Clock, Globe, Send, CheckCircle, AlertCircle, 
   Sparkles, MessageSquare, Shield, HelpCircle, ArrowRight
@@ -25,38 +26,38 @@ export default function ContactUsPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
-  const [toast, setToast] = useState(null);
+  const [toast, setToast] = useState({ show: false, type: 'success', text: '' });
 
   const showToast = (type, text) => {
-    setToast({ type, text });
+    setToast({ show: true, type, text });
     setTimeout(() => {
-      setToast(null);
+      setToast({ show: false, type: 'success', text: '' });
     }, 5000);
+  };
+
+  const validateEmail = (emailStr) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailStr);
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const validateEmail = (email) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email).toLowerCase());
+    if (error) setError('');
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    // Client-side validation
-    if (!formData.name || !formData.company || !formData.email || !formData.subject || !formData.message) {
-      const errMsg = 'Please complete all required fields (*).';
+    if (!formData.name.trim() || !formData.company.trim() || !formData.email.trim() || !formData.subject.trim() || !formData.message.trim()) {
+      const errMsg = 'Please fill out all required fields marked with *';
       setError(errMsg);
       showToast('error', errMsg);
       return;
     }
 
     if (!validateEmail(formData.email)) {
-      const errMsg = 'Please enter a valid email address.';
+      const errMsg = 'Please enter a valid email address';
       setError(errMsg);
       showToast('error', errMsg);
       return;
@@ -65,18 +66,10 @@ export default function ContactUsPage() {
     setLoading(true);
 
     try {
-      const res = await fetch('/api/contact', {
+      await request('/contact', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
+        body: formData
       });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to submit contact inquiry.');
-      }
 
       setSuccess(true);
       showToast('success', 'Your inquiry has been sent successfully! We have emailed you a confirmation.');

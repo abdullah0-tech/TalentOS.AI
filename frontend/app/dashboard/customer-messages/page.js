@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { request } from '../../../services/api';
 import { 
   MessageSquare, Mail, Search, Filter, Trash2, CheckCircle, Clock, 
   Archive, Send, Reply, AlertCircle, RefreshCw, Eye, EyeOff, 
@@ -24,9 +25,9 @@ export default function CustomerMessagesPage() {
 
   // Configure Stats Modal State
   const [statsModalOpen, setStatsModalOpen] = useState(false);
-  const [statsData, setStatsData] = useState([]);
   const [statsLoading, setStatsLoading] = useState(false);
   const [statsSaving, setStatsSaving] = useState(false);
+  const [statsData, setStatsData] = useState([]);
 
   // Toast State
   const [toast, setToast] = useState(null);
@@ -42,11 +43,7 @@ export default function CustomerMessagesPage() {
     setLoading(true);
     setError('');
     try {
-      const res = await fetch('/api/contact/messages');
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to fetch customer messages');
-      }
+      const data = await request('/contact/messages');
       setMessages(data.data || []);
       const unread = (data.data || []).filter((m) => m.status === 'UNREAD').length;
       setUnreadCount(unread);
@@ -63,15 +60,10 @@ export default function CustomerMessagesPage() {
 
   const handleUpdateStatus = async (id, newStatus) => {
     try {
-      const res = await fetch(`/api/contact/messages/${id}/status`, {
+      await request(`/contact/messages/${id}/status`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus })
+        body: { status: newStatus }
       });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to update message status');
-      }
       setMessages((prev) =>
         prev.map((msg) => (msg.id === id ? { ...msg, status: newStatus } : msg))
       );
@@ -89,13 +81,9 @@ export default function CustomerMessagesPage() {
       return;
     }
     try {
-      const res = await fetch(`/api/contact/messages/${id}`, {
+      await request(`/contact/messages/${id}`, {
         method: 'DELETE'
       });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to delete message');
-      }
       setMessages((prev) => prev.filter((m) => m.id !== id));
       showToast('success', 'Message deleted successfully');
     } catch (err) {
@@ -115,15 +103,10 @@ export default function CustomerMessagesPage() {
 
     setReplyLoading(true);
     try {
-      const res = await fetch(`/api/contact/messages/${selectedMsg.id}/reply`, {
+      await request(`/contact/messages/${selectedMsg.id}/reply`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ replyMessage: replyText })
+        body: { replyMessage: replyText }
       });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to send reply email');
-      }
 
       showToast('success', `Reply sent to ${selectedMsg.email}`);
       setMessages((prev) =>
@@ -144,9 +127,8 @@ export default function CustomerMessagesPage() {
     setStatsModalOpen(true);
     setStatsLoading(true);
     try {
-      const res = await fetch('/api/contact/stats');
-      const data = await res.json();
-      if (res.ok && data.data) {
+      const data = await request('/contact/stats');
+      if (data.data) {
         setStatsData(data.data);
       }
     } catch (err) {
@@ -168,15 +150,10 @@ export default function CustomerMessagesPage() {
     e.preventDefault();
     setStatsSaving(true);
     try {
-      const res = await fetch('/api/contact/stats', {
+      await request('/contact/stats', {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ stats: statsData })
+        body: { stats: statsData }
       });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to update statistics');
-      }
       showToast('success', 'Public website statistics updated successfully');
       setStatsModalOpen(false);
     } catch (err) {

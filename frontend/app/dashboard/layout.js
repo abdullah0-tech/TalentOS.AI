@@ -300,9 +300,8 @@ export default function DashboardLayout({ children }) {
 
   const fetchUnreadCustomerMessagesCount = async () => {
     try {
-      const res = await fetch('/api/contact/messages/unread-count');
-      const data = await res.json();
-      if (res.ok && data.unreadCount !== undefined) {
+      const data = await request('/contact/messages/unread-count');
+      if (data.unreadCount !== undefined) {
         setUnreadCustomerMessagesCount(data.unreadCount);
       }
     } catch (err) {
